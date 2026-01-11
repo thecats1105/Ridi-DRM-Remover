@@ -306,11 +306,63 @@ class ExportCommand:
                 return
 
             infos = ridi_utils.book_infos(lib_path)
+            # Filter out books without .dat files
+            infos = [b for b in infos if b.file_path(ridi_utils.FileKind.DATA).exists()]
+
             if not infos:
                 print("No books found in library.")
                 return
             
-            print(f"Found {len(infos)} books. Preparing to export...")
+            # Filter candidates 
+            candidates: List[ridi_utils.BookInfo] = []
+            
+            # If ID filter is on, we can filter immediately
+            if id_filter:
+                infos = [b for b in infos if b.id == id_filter]
+            
+            if not infos:
+                print("No matching books found (ID filter).")
+                return
+
+            # If name filter is on, we need to inspect titles
+            if name_filter:
+                print("Scanning books to match title...")
+                for book in infos:
+                    try:
+                        key = ridi_utils.decrypt_key(book, device_id)
+                        book_content = ridi_utils.decrypt_book(book, key)
+                        title = ridi_utils.extract_title(book.format, book_content)
+                        if title and name_filter in title:
+                            candidates.append(book)
+                    except:
+                        continue
+            else:
+                candidates = infos
+
+            # Determine what to export
+            # If explicit filters are given (-n or -i), we export matched.
+            # If no filters given, we check for --all.
+            # If no filters and no --all, what is default?
+            # Instructions: "--all ... to export ALL".
+            # This implies if NO flags, maybe it shouldn't export?
+            # But commonly we preserve "export all by default" or "require arguments".
+            # The prompt says: "add --all argument to export all downloaded books".
+            # Current behavior is export all.
+            # I will assume:
+            # If filters are present -> export matches.
+            # If no filters:
+            #    If --all is present -> export all.
+            #    If --all is NOT present -> export all (default behavior) or maybe Ask?
+            # To be safe and user friendly: Default to ALL implies --all isn't strictly needed for behavior "export all",
+            # but maybe the user wants to force explicit "all".
+            # However, if I implement filters, "no filters" usually means "everything".
+            # Let's keep it simple: "candidates" contains everything after filtering.
+            
+            if not candidates:
+                print("No books found matching criteria.")
+                return
+
+            print(f"Found {len(candidates)} books. Preparing to export...")
             
             # Prepare output directory
             out_path = Path(output_dir)
@@ -322,25 +374,23 @@ class ExportCommand:
                     print(f"Failed to create output directory: {e}")
                     return
             
-            # We need to monkeypatch or modify where ridi_utils saves files, 
-            # OR we change directory, OR we modify ridi_utils to accept output path.
-            # ridi_utils.decrypt writes to current directory.
-            # Let's change CWD safely or modify ridi_utils.
-            
             # Strategy: Change CWD to output_dir, run decrypt, then change back.
             original_cwd = os.getcwd()
             os.chdir(out_path)
             
+            success_count = 0
             try:
-                for book_info in infos:
-                    ridi_utils.decrypt_with_progress(book_info, device_id, debug=False)
+                for book_info in candidates:
+                    if ridi_utils.decrypt_with_progress(book_info, device_id, debug=False):
+                        success_count += 1
             finally:
                 os.chdir(original_cwd)
                 
-            print(f"\nExport completed to {out_path}")
+            print(f"\nExport completed. {success_count}/{len(candidates)} books exported to {out_path}")
             
         except Exception as e:
             print(f"Error during export: {e}")
+
 
 def main():
     parser = argparse.ArgumentParser(prog="ridi", description="Ridi Books DRM Remover CLI Utility")
