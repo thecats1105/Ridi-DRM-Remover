@@ -1,4 +1,3 @@
-import argparse
 import os
 import sys
 import io
@@ -113,7 +112,7 @@ def library_path(user_idx: str) -> Path:
 
 def book_infos(path: Path) -> List[BookInfo]:
     """Get BookInfo objects for all books in the library"""
-    infos = []
+    infos: List[BookInfo] = []
     if not path.exists():
         return infos
     
@@ -314,6 +313,7 @@ def decrypt_book(book_info: BookInfo, key: bytes, debug: bool = False) -> bytes:
     plaintext = unpadder.update(decrypted) + unpadder.finalize()
     return plaintext
 
+
 def decrypt(book_info: BookInfo, device_id: str, debug: bool = False):
     """Decrypt a book and save it to the current directory"""
     key = decrypt_key(book_info, device_id, debug)
@@ -360,63 +360,3 @@ def decrypt_with_progress(book_info: BookInfo, device_id: str, debug: bool = Fal
             print(f"⣿ Decrypting \"{file_name}\" ✘")
             print(f"  Error: {e}")
         return False
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Decrypt Ridibooks files",
-        prog="ridibooks-decrypt"
-    )
-    parser.add_argument(
-        "-d", "--device-id",
-        required=True,
-        dest="device_id",
-        help="Device ID (36 characters)"
-    )
-    parser.add_argument(
-        "-u", "--user-idx",
-        required=True,
-        dest="user_idx",
-        help="User index"
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable debug output"
-    )
-    
-    args = parser.parse_args()
-    
-    try:
-        # Verify arguments
-        verify(args.device_id, args.user_idx)
-        
-        # Get library path and book infos
-        lib_path = library_path(args.user_idx)
-        
-        if args.debug:
-            print(f"Library path: {lib_path}")
-        
-        if not lib_path.exists():
-            print(f"Error: Library path does not exist: {lib_path}", file=sys.stderr)
-            sys.exit(1)
-        
-        infos = book_infos(lib_path)
-        
-        if not infos:
-            print("No books found in library")
-            return
-        
-        if args.debug:
-            print(f"Found {len(infos)} book(s)")
-            print()
-        
-        # Decrypt all books with progress
-        for book_info in infos:
-            decrypt_with_progress(book_info, args.device_id, args.debug)
-        
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
