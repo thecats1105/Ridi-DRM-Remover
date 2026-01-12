@@ -1,94 +1,97 @@
-# Ridi_DRM_Remover
+# Ridi-DRM-Remover
 
-`Ridi_DRM_Remover` is a command-line interface and GUI tool that extracts the ebooks you've purchased from Ridi and converts them into DRM-free files, enabling you to read them with your preferred ebook readers. It currently only supports EPUB and PDF formats.
+A CLI tool to decrypt purchased and downloaded ebooks from Ridibooks, converting them into DRM-free files (EPUB/PDF).
 
 > **Disclaimer**
-> 
-> All goods obtained through the use of this software must not be shared with, distributed to, or sold for any purpose to others, in any form, under any circumstances. Any consequences resulting from the violation of this provision are solely your responsibility, and the developers of this software bear no responsibility whatsoever. Use at your own risk!
+>
+> All goods obtained through this software must not be shared, distributed, or sold. Any consequences resulting from the misuse of this software are solely the user's responsibility. Use at your own risk.
 
 ## Prerequisites
 
-To use `Ridi_DRM_Remover`, you need the following:
-
-*   Ridi App
-*   Python 3.8 or higher
-
->If you have windows OS, you can run the .exe directly by downloading it from the releases.
+- **Python 3.8+**
+- **Ridibooks Desktop App**: Books must be downloaded through the official app before they can be decrypted.
 
 ## Installation
 
-1.  **Clone the repository (if you haven't already):**
-    ```bash
-    git clone https://https://github.com/Retro-Rex8/Ridi-DRM-Remover
-    cd Ridi-DRM-Remover
-    ```
-    
-2.  **Create a virtual environment (recommended):**
-    ```bash
-    python -m venv venv
-    ```
+1. Clone the repository:
 
-3.  **Activate the virtual environment:**
-    *   **On Windows:**
-        ```bash
-        .\venv\Scripts\activate
-        ```
-    *   **On macOS/Linux:**
-        ```bash
-        source venv/bin/activate
-        ```
+   ```bash
+   git clone https://github.com/thecats1105/Ridi-DRM-Remover.git
+   cd Ridi-DRM-Remover
+   ```
 
-4.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+2. (Optional) Create and activate a virtual environment:
 
-## How to Use
+   ```bash
+   python -m venv venv
+   # Windows
+   .\venv\Scripts\activate
+   # macOS/Linux
+   source venv/bin/activate
+   ```
 
-### Step 1: Prepare Your Ridi Books
+3. Install requirements:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-1.  Run the Ridi app installed on your computer.
-2.  Download the books you want from the purchases screen.
+## Usage
 
-### Step 2: Get Device Information
+The tool uses `ridi.py` as the main entry point.
 
-1.  Open a browser, go to <https://ridibooks.com/account/login> and log in.
-2.  After successfully logging in, go to <https://account.ridibooks.com/api/user-devices/app> to get the device information. Then, in the JSON result, find and note down the values of the fields `device_id` and `user_idx` for the specific device that you use which has Ridi app Installed.
+### 1. Authentication (`auth`)
 
-### Step 3: Decrypt Your Books
-
-You can use either the Graphical User Interface (GUI) or the Command-Line Interface (CLI) to decrypt your books.
-
-(Note: it assumes Default Path for the downloaded books).
-
-#### Using the GUI
-
-Run the GUI application:
+Before decrypting, you need to authenticate to store your `device_id` and `user_idx`.
 
 ```bash
-python ridi_books_gui.py
+python ridi.py auth login
 ```
 
-Enter your `Device ID` and `User Index` in the respective fields, select an `Output Folder`, and click "Decrypt Books".
+- Follow the instructions to log in through the browser.
+- Once logged in, copy the JSON data from the provided URL.
+- Paste it back into the terminal and select the device where your books are downloaded.
 
-#### Using the CLI
+**Other auth commands:**
 
-Run the command-line tool with your `device_id` and `user_idx`:
+- `python ridi.py auth list`: List saved accounts.
+- `python ridi.py auth switch`: Switch the active account.
+- `python ridi.py auth logout`: Remove account information.
+
+### 2. List Books (`books`)
+
+Scan your local library to see which books are available for decryption.
 
 ```bash
-python ridi_books.py --device-id YOUR_DEVICE_ID --user-idx YOUR_USER_INDEX
+python ridi.py books
 ```
 
-*   Replace `YOUR_DEVICE_ID` with the `device_id` you obtained.
-*   Replace `YOUR_USER_INDEX` with the `user_idx` you obtained.
-*   Add `--debug` flag for detailed output:
-    ```bash
-    python ridi_books.py --device-id YOUR_DEVICE_ID --user-idx YOUR_USER_INDEX --debug
-    ```
+- **Filter by name**: `python ridi.py books -n "Aranya"`
+- **Filter by ID**: `python ridi.py books -i "123456"`
+
+### 3. Decrypt and Export (`export`)
+
+Decrypt the downloaded books and save them to a specified directory.
+
+```bash
+# Export all downloaded books
+python ridi.py export --all -o ./output
+
+# Export specific book by ID
+python ridi.py export -i "123456" -o ./output
+
+# Export books matching a name
+python ridi.py export -n "Title"
+```
+
+## Features
+
+- **Multi-account support**: Manage multiple Ridi accounts. Device selection ensures the decryption data matches the specific device where the Ridi viewer is running.
+- **Title Extraction**: Automatically extracts book titles from EPUB/PDF metadata for clean filenames.
+- **EPUB & PDF Support**: Handles both major ebook formats provided by Ridibooks.
+- **Safe Filenames**: Sanitizes titles to prevent filesystem errors.
 
 ## References
 
-* https://github.com/hsj1/ridiculous
-
-
-
+- [Retro-Rex8/Ridi-DRM-Remover](https://github.com/Retro-Rex8/Ridi-DRM-Remover)
+- [hsj1/ridiculous](https://github.com/hsj1/ridiculous)
+- This project is inspired by various community research on Ridi DRM.
