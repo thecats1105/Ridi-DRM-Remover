@@ -1,5 +1,9 @@
+# Python cache files
 __pycache__/
 venv/
 
+# Nuitka build files
+builds/
+
+# Generated eBook files
 books/
-.auth.json
