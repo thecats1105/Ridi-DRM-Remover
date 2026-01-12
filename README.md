@@ -83,6 +83,15 @@ python ridi.py export -i "123456" -o ./output
 python ridi.py export -n "Title"
 ```
 
+## Compilation (Build)
+
+You can compile `ridi.py` into a standalone executable using [Nuitka](https://nuitka.net/). **Python 3.13** is recommended for stable compilation:
+
+```bash
+# Compile to a single executable
+python -m nuitka --onefile --output-dir=builds/ ridi.py
+```
+
 ## Features
 
 - **Multi-account support**: Manage multiple Ridi accounts. Device selection ensures the decryption data matches the specific device where the Ridi viewer is running.

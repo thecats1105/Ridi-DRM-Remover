@@ -83,6 +83,15 @@ python ridi.py export -i "123456" -o ./output
 python ridi.py export -n "제목"
 ```
 
+## 컴파일 (빌드)
+
+[Nuitka](https://nuitka.net/)를 사용하여 `ridi.py`를 단일 실행 파일(.exe)로 컴파일할 수 있습니다. 안정적인 컴파일을 위해 **Python 3.13** 사용을 권장합니다:
+
+```bash
+# 단일 실행 파일로 컴파일
+python -m nuitka --onefile --output-dir=builds/ ridi.py
+```
+
 ## 주요 기능
 
 - **다중 계정 지원**: 여러 개의 리디 계정을 관리할 수 있습니다. 기기 선택은 현재 리디북스 뷰어가 활성화된 기기의 암호화 데이터를 일치시키기 위해 사용됩니다.
