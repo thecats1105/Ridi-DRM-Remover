@@ -4,6 +4,7 @@ import urllib.parse
 import webbrowser
 import sys
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, List, Any
 import ridi_utils
@@ -138,11 +139,21 @@ class AuthCommand:
                 return
 
             print("\nSelect the device you are using for this machine:")
-            print(f"{'No.':<4} {'Device Name':<20} {'Device ID':<40} {'Code':<10}")
-            print("-" * 80)
+            print(f"{'No.':<4} {'Device Name':<20} {'Device ID':<40} {'Code':<10} {'Last Used':<20}")
+            print("-" * 100)
             
             for idx, dev in enumerate(devices):
-                print(f"{idx+1:<4} {dev.get('device_nick', 'Unknown'):<20} {dev.get('device_id'):<40} {dev.get('device_code'):<10}")
+                last_used_raw = dev.get('last_used')
+                if last_used_raw:
+                    try:
+                        # Handle 'Z' suffix and set to local timezone
+                        dt = datetime.fromisoformat(last_used_raw.replace('Z', '+00:00'))
+                        last_used = dt.astimezone().strftime('%Y-%m-%d %H:%M:%S')
+                    except Exception:
+                        last_used = last_used_raw
+                else:
+                    last_used = 'N/A'
+                print(f"{idx+1:<4} {dev.get('device_nick', 'Unknown'):<20} {dev.get('device_id'):<40} {dev.get('device_code'):<10} {last_used:<20}")
             
             while True:
                 try:
