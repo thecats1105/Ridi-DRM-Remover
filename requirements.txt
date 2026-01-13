@@ -1,5 +1,11 @@
+# Requirements for Ridi DRM Remover
 cryptography
 PyPDF2
+
+# For compiling with Nuitka
 nuitka
 zstandard
+
+# For code quality checks
+pylint
 
