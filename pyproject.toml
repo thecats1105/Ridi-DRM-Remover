@@ -1,14 +1,19 @@
 [project]
 name = "ridi-drm-remover"
 version = "0.1.0"
-description = "Add your description here"
+description = "A CLI tool to decrypt purchased and downloaded ebooks from Ridibooks, converting them into DRM-free files (EPUB/PDF)."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "cryptography>=46.0.3",
-    "nuitka>=2.8.9",
     "pypdf2>=3.0.1",
-    "zstandard>=0.25.0",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.37.1",
+    "nuitka>=2.8.9",
+    "ruff>=0.14.13",
 ]
 
 [tool.basedpyright]

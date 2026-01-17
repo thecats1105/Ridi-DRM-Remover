@@ -3,6 +3,10 @@ Main entry point for Ridi Books DRM Remover CLI Utility.
 Provides commands for authentication, listing books, and exporting decrypted files.
 """
 
+# Nuitka build flags:
+# nuitka-project: --onefile
+# nuitka-project: --output-dir=dist
+
 import argparse
 import json
 import logging

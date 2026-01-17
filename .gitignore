@@ -1,9 +1,9 @@
 # Python cache files
 __pycache__/
-venv/
+.venv/
 
 # Nuitka build files
-builds/
+dist/
 
 # Generated eBook files
 books/
